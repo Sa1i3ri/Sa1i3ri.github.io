@@ -868,4 +868,91 @@ NextDayDateDisplayer所声明的依赖dateOfNextDay的类型为DateTime，而不
 
 
 
-//TODO
+## 方法注入（Method Injection）
+
+```java
+public class MockNewsPersister implements IFXNewsPersister { 
+	private FXNewsBean newsBean; 
+	public void persistNews(FXNewsBean bean) { 
+		persistNewes(); 
+	} 
+	public void persistNews() { 
+		System.out.println("persist bean:"+getNewsBean()); 
+ 	} 
+	public FXNewsBean getNewsBean() { 
+		return newsBean; 
+ 	}
+    public void setNewsBean(FXNewsBean newsBean) { 
+		this.newsBean = newsBean; 
+ 	} 
+}
+```
+
+```xml
+<bean id="newsBean" class="..domain.FXNewsBean" singleton="false"> 
+</bean> 
+<bean id="mockPersister" class="..impl.MockNewsPersister"> 
+ <property name="newsBean"> 
+<ref bean="newsBean"/> 
+ </property> 
+</bean> 
+```
+
+虽然FXNewsBean拥有prototype类型的scope，但当容器将一个FXNewsBean的实例注入 MockNewsPersister之后，MockNewsPersister就会一直持有这个FXNewsBean实例的引用。虽然每 次输出都调用了getNewsBean()方法并返回了 FXNewsBean 的实例，但实际上每次返回的都是 MockNewsPersister持有的容器**第一次注入的实例**。
+
+
+
+方法注入：
+
+```xml
+<bean id="newsBean" class="..domain.FXNewsBean" singleton="false"> 
+</bean> 
+<bean id="mockPersister" class="..impl.MockNewsPersister"> 
+	<lookup-method name="getNewsBean" bean="newsBean"/> 
+</bean> 
+```
+
+`<lookup-method>`通过的name属性指定需要注入的方法名，bean属性指定需要注入的对象，当 getNewsBean方法被调用的时候，容器可以每次返回一个新的FXNewsBean类型的实例。
+
+
+
+## 方法替换（Method Replacement）
+
+与方法注入只是通过相应方法为主体对象注入依赖对象不同，方法替换更多体现在方法的实现层 面上，它可以灵活替换或者说以新的方法实现覆盖掉原来某个方法的实现逻辑。基本上可以认为，方 法替换可以帮助我们实现简单的方法拦截功能。
+
+首先，我们需要给出org.springframework.beans.factory.support.MethodReplacer的实现 类，在这个类中实现将要替换的方法逻辑。
+
+```java
+public class FXNewsProviderMethodReplacer implements MethodReplacer { 12  
+ 	private static final transient Log logger =LogFactory.getLog(FXNewsProviderMethodReplacer.class); 
+  
+ 	public Object reimplement(Object target, Method method, Object[] args)throws Throwable { 
+  		logger.info("before executing method["+method.getName()+"] on 			 Object["+target.getClass().getName()+"]."); 
+   
+  System.out.println("sorry,We will do nothing this time."); 
+  logger.info("end of executing method["+method.getName()+"] on Object["+target.getClass().getName()+"]."); 
+	return null; 
+}
+```
+
+有了要替换的逻辑之后，我们就可以把这个逻辑通过`<replaced-method>`配置到FXNewsProvider的bean定义中，使其生效
+
+```xml
+<bean id="djNewsProvider" class="..FXNewsProvider"> 
+ <constructor-arg index="0"> 
+<ref bean="djNewsListener"/> 
+ </constructor-arg> 
+ <constructor-arg index="1"> 
+<ref bean="djNewsPersister"/> 
+ </constructor-arg> 
+	<replaced-method name="getAndPersistNews" replacer="providerReplacer"> 
+ 	</replaced-method> 
+</bean> 
+
+<bean id="providerReplacer" class="..FXNewsProviderMethodReplacer"> 
+</bean> 
+<!--其他bean配置--> 
+... 
+```
+
+我们把FXNewsProvider的getAndPersistNews方法逻辑给完全替换掉了。
