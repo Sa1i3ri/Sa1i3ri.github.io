@@ -74,7 +74,7 @@ jobs:
         id: upload-artifact
         uses: actions/upload-pages-artifact@main
         with:
-          name: github-pagesame
+          name: github-pages
 
       - name: Deploy to GitHub Pages
         id: deployment
