@@ -71,7 +71,7 @@ jobs:
     needs: build
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v3  # Download the uploaded artifact from the previous job
+        uses: actions/download-artifact@v2  # Download the uploaded artifact from the previous job
         with:
           name: github-pages  # Ensure this matches the uploaded artifact name
 
