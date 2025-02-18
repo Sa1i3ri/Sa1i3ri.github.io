@@ -66,15 +66,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      # Download artifact before deploying
-      - name: Download artifact
-        uses: actions/download-pages-artifact@v3
-        with:
-          name: github-pages  # Ensure the name matches the uploaded artifact
-
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifact_name: github-pages  # Ensure the name matches the uploaded artifact
+          artifact_name: github-pages  # Ensure this matches the uploaded artifact name
