@@ -54,10 +54,17 @@ jobs:
             --disable-external=true \
             --ignore-urls "/^http:\/\/127.0.0.1/,/^http:\/\/0.0.0.0/,/^http:\/\/localhost/"
 
+      - name: List _site directory
+        run: ls -la "_site${{ steps.pages.outputs.base_path }}"  # List the contents of _site to debug
+
+      - name: Check artifact path before upload
+        run: echo "_site${{ steps.pages.outputs.base_path }}"  # Debug path
+
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: "_site${{ steps.pages.outputs.base_path }}"
+          name: github-pages  # Specify artifact name here
 
   deploy:
     environment:
