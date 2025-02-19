@@ -1,5 +1,4 @@
 name: "Build and Deploy"
-
 on:
   push:
     branches:
@@ -32,6 +31,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # submodules: true
+          # If using the 'assets' git submodule from Chirpy Starter, uncomment above
+          # (See: https://github.com/cotes2020/chirpy-starter/tree/main/assets)
 
       - name: Setup Pages
         id: pages
@@ -51,20 +53,13 @@ jobs:
       - name: Test site
         run: |
           bundle exec htmlproofer _site \
-            --disable-external=true \
-            --ignore-urls "/^http:\/\/127.0.0.1/,/^http:\/\/0.0.0.0/,/^http:\/\/localhost/"
-
-      - name: Remove symlinks in _site
-        run: find _site -type l -exec rm {} \;  # Remove any symlinks before uploading
-
-      - name: List _site directory
-        run: ls -la "_site${{ steps.pages.outputs.base_path }}"  # List the contents of _site to debug
-
+            \-\-disable-external=true \
+            \-\-ignore-urls "/^http:\/\/127.0.0.1/,/^http:\/\/0.0.0.0/,/^http:\/\/localhost/"
       - name: Upload site artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-pages-artifact@v3
         with:
           path: "_site${{ steps.pages.outputs.base_path }}"
-          name: github-pages  # Explicitly set artifact name to "github-pages"
+          
 
   deploy:
     environment:
@@ -76,6 +71,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          artifact_name: github-pages  # Ensure this matches the name used in the upload step
