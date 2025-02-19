@@ -82,6 +82,7 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         uses: actions/deploy-pages@v4
         env:
+          path: "_site${{ steps.pages.outputs.base_path }}"
           name: github-pages
           url: ${{ steps.deployment.outputs.page_url }}
         with: 
