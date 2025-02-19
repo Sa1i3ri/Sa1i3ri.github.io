@@ -58,7 +58,7 @@ jobs:
         run: ls -la "_site${{ steps.pages.outputs.base_path }}"  # List the contents of _site to debug
 
       - name: Upload site artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@main
         with:
           path: "_site${{ steps.pages.outputs.base_path }}"
           name: github-pages  # Specify artifact name here
@@ -74,6 +74,7 @@ jobs:
         id: upload-artifact
         uses: actions/upload-pages-artifact@main
         with:
+          path: "_site${{ steps.pages.outputs.base_path }}"
           name: github-pages
 
       - name: Deploy to GitHub Pages
