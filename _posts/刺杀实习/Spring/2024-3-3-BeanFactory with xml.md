@@ -1,6 +1,6 @@
 ---
-categories: [课外笔记,Spring]
-tag: [课外笔记,Spring]
+categories: [刺杀实习,Spring]
+tag: [刺杀实习,Spring]
 ---
 
 ## BeanFactory
